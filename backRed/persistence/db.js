@@ -69,8 +69,9 @@ exports.postComments = function(req, res) {
 }
 
 exports.postPublications = function(req, res) {
+    console.log(req.body)
     insert(req.body, 'publications', (documentos) => {
-        res.send(documentos);
+        valueSend(res, 200, "OK", documentos)
     });
 }
 

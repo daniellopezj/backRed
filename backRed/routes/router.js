@@ -13,6 +13,7 @@ exports.assignRoutes = function(app) {
     app.put('/person', db.UpdatePerson);
 
     app.post('/login', db.login);
+    app.post('/publications', db.postPublications);
     /*   
         app.get('/blogs', db.getblogs);
         app.get('/comments', db.getcomments);
@@ -21,7 +22,7 @@ exports.assignRoutes = function(app) {
         //*************SOLICITUDES POST******************
         app.post('/blogs', db.postBlogs);
         app.post('/comments', db.postComments);
-        app.post('/publications', db.postPublications);
+      
     
         //*************SOLICITUDES REMOVE******************
         app.delete('/blogs/:id_blog', db.removeBlogs);
