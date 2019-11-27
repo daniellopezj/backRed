@@ -4,28 +4,20 @@ var nameDataBase = "RedSocial"
     /********************** GET *****************************/
 exports.getperson = function(req, res) {
     select(req.body, 'persons', (documentos) => {
-
-        res.send(documentos);
-    })
-}
-
-exports.getblogs = function(req, res) {
-    select(req.body, 'blogs', (documentos) => {
-        res.send(documentos);
-    })
-}
-
-exports.getcomments = function(req, res) {
-    select(req.body, 'comments', (documentos) => {
         res.send(documentos);
     })
 }
 
 exports.getpublications = function(req, res) {
     select(req.body, 'publications', (documentos) => {
-        res.send(documentos);
+        if (documentos === undefined || documentos.length == 0) {
+            valueSend(res, 400, "error", "Ups ocurrio un error")
+        } else {
+            valueSend(res, 200, "OK", documentos)
+        }
     })
 }
+
 
 exports.getpublicationsName = function(req, res) {
         select("{},{ public_title:1}", 'publications', (documentos) => {
@@ -56,6 +48,7 @@ function valueSend(res, status, message, value) {
         "object": value
     }));
 }
+
 exports.postBlogs = function(req, res) {
     insert(req.body, 'blogs', (documentos) => {
         res.send(documentos);
@@ -83,48 +76,10 @@ exports.removePerson = function(req, res) {
     });
 }
 
-exports.removeBlogs = function(req, res) {
-    var id_blog = parseInt(req.params.id_blog);
-    remove({ "id_blog": id_blog }, 'blogs', (documentos) => {
-        res.send(documentos);
-    });
-}
-
-exports.removeComments = function(req, res) {
-    remove(req.body, 'comments', (documentos) => {
-        res.send(documentos);
-    });
-}
-
-exports.removePublications = function(req, res) {
-    var id_publication = parseInt(req.params.id_publication);
-    console.log(id_publication)
-    remove({ "id_publication": id_publication }, 'publications', (documentos) => {
-        res.send(documentos);
-    });
-}
 
 /********************** UPDATE *****************************/
 exports.UpdatePerson = function(req, res) {
     Update({ "id_person": req.body.id_person }, req.body, 'persons', (documentos) => {
-        res.send(documentos);
-    });
-}
-
-exports.UpdateBlogs = function(req, res) {
-    Update({ "id_blog": req.body.id_blog }, req.body, 'blogs', (documentos) => {
-        res.send(documentos);
-    });
-}
-
-exports.UpdateComments = function(req, res) {
-    Update({ "id_comment": req.body.id_comment }, req.body, 'comments', (documentos) => {
-        res.send(documentos);
-    });
-}
-
-exports.UpdatePublications = function(req, res) {
-    Update({ "id_publication": req.body.id_publication }, req.body, 'publications', (documentos) => {
         res.send(documentos);
     });
 }
@@ -139,6 +94,7 @@ function select(query, collection, callback) {
 
 const selectData = async function(query, col, db, callback) {
     const collection = db.collection(col);
+    console.log(query);
     collection.find(query).toArray(function(err, docs) {
         callback(docs)
     });
@@ -196,4 +152,26 @@ const UpdateData = async function(condition, set, col, db, callback) {
     } catch (error) {
         callback({ "status": 400, "message": "upsss, ocurrio un error" });
     }
+}
+
+exports.getMeetPersons = function(req, res) {
+    gettodb({ _id: 0, user: 1, image: 1 }, (documentos) => {
+        res.send(documentos);
+    })
+}
+
+
+function gettodb(query, callback) {
+    mongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, db) { //here db is the client obj
+        if (err) throw err;
+        var dbase = db.db("RedSocial"); //here
+        findDateDb(query, dbase, callback)
+    });
+}
+
+const findDateDb = async function(query, db, callback) {
+    const collection = db.collection('persons');
+    collection.find({}).project(query).toArray(function(err, docs) {
+        callback(docs)
+    });
 }

@@ -11,14 +11,17 @@ exports.assignRoutes = function(app) {
     app.post('/person', db.postPerson);
     app.delete('/person/:id_person', db.removePerson);
     app.put('/person', db.UpdatePerson);
-
+    app.get('/meetPersons', db.getMeetPersons);
     app.post('/login', db.login);
+
+    app.get('/publications', db.getpublications);
     app.post('/publications', db.postPublications);
+    app.get('/namePublications', db.getpublicationsName);
     /*   
         app.get('/blogs', db.getblogs);
         app.get('/comments', db.getcomments);
-        app.get('/publications', db.getpublications);
-        app.get('/namePublications', db.getpublicationsName);
+      
+     
         //*************SOLICITUDES POST******************
         app.post('/blogs', db.postBlogs);
         app.post('/comments', db.postComments);
