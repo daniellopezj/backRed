@@ -26,6 +26,7 @@ exports.getpublicationsName = function(req, res) {
     }
     /********************** POST *****************************/
 exports.postPerson = function(req, res) {
+    console.log(req.body)
     insert(req.body, 'persons', (documentos) => {
         res.send(documentos);
     });

@@ -1,5 +1,8 @@
 var body_parser = require('body-parser');
 var db = require('../persistence/db');
+var neo = require('../persistence/PersistenceNeo')
+var cassandra = require('../persistence/persistenceCassandra')
+
 exports.assignRoutes = function(app) {
     app.use(body_parser.urlencoded({ extended: true }));
 
