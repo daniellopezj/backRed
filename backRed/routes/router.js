@@ -1,10 +1,14 @@
 var body_parser = require('body-parser');
 var db = require('../persistence/db');
+var clientCassandra = require('../persistence/cassandraDB')
 exports.assignRoutes = function(app) {
     app.use(body_parser.urlencoded({ extended: true }));
 
     //REALIZA LA CONEXION Y LA INSERCION DE DATOS EN MONGO 
     //db.connectDB();
+
+    ///// Inicia conexion base de datos cassandra
+    clientCassandra.createTable()
 
     //*************SOLICITUDES GET******************
     app.get('/person', db.getperson);
