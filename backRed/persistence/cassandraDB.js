@@ -6,12 +6,14 @@ const client = new cassandra.Client({
 });
 
 const createDB = `CREATE TABLE publications(
-    id_publication BIGINT, 
+    id varchar, 
     title TEXT, 
     description TEXT, 
-    likes_list list<TEXT>,
+    link_Sound TEXT,
     nickname_author TEXT,
-    PRIMARY KEY(id_publication)
+    date TIMESTAMP,
+    countLikes INT,
+    PRIMARY KEY(id)
 )`
 
 exports.createTable = function () {
@@ -23,11 +25,33 @@ exports.createTable = function () {
     });    
 }
 
+/**
+ * AGREGA PUBLICACIONES A LA CASSANDRADB
+ */
+exports.loadFeaturedPost = function(posts) {
+    console.log(posts);
+    const queryAdd = 'INSERT INTO PUBLICATIONS (id, title, description, link_Sound, nickname_author, date, countLikes) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    var queries = [];
+    posts.forEach(element => {
+        queries.push({query: queryAdd, params: [`${element._id}`, element.tittle, element.description, 
+                        element.link_Sound, element.nicknameAutor, element.date, element.countLikes]})
+    });
+
+    console.log(queries);
+    client.batch(queries, {prepare: true}, (err) => {
+        if(err) {
+            console.log(':(' , err);
+        } else {
+            console.log('Datos insertados correctamente');
+        }
+    })
+    
+}
 
 /**
  * Docker 
  * Iniciar contenedor 
- * docker run --name sounArtDB -d -p 127.0.0.1:3005:9042 cassandra:latest
+ * docker run --name soundArtDB -d -p 127.0.0.1:3005:9042 cassandra:latest
  * 
  * Iniciar cliente cassandra
  * docker exec -it soundArtDB cqlsh

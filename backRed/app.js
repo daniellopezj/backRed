@@ -20,8 +20,8 @@ app.use(express.json());
 
 
 // DONDE ESCUCHA EL SERVIDOR
-app.listen(3001, function() {
-    console.log('app listening on port 3001!');
+app.listen(3000, function() {
+    console.log('app listening on port 3000!');
 });
 
 //hacer llamado a enrutador

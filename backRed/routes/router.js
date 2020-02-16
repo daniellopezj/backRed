@@ -9,6 +9,11 @@ exports.assignRoutes = function(app) {
 
     ///// Inicia conexion base de datos cassandra
     clientCassandra.createTable()
+    db.getFeaturedPost(3, (result)=>{
+        clientCassandra.loadFeaturedPost(result);
+    });
+    
+   // clientCassandra.loadFeaturedPost(db.getFeaturedPost(3));
 
     //*************SOLICITUDES GET******************
     app.get('/person', db.getperson);
