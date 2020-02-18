@@ -176,13 +176,6 @@ const findDateDb = async function (query, db, callback) {
     });
 }
 
-exports.getTrending = function (params) {
-    db.collection.find().sort({ countLikes: 1 }).toArray(function (err, result) {
-        if (err) throw err;
-        console.log(result);
-        //db.close();
-    });
-}
 
 /*
 Obtener las publicaciones m'as vistas

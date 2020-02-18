@@ -24,11 +24,26 @@ exports.createTable = function () {
         console.log('Fallo en la creacion de tablas ' , error.message)
     });    
 }
+/*
+Obtener publicaciones de base de datos
+*/
+exports.getPublications = function (req, res) {
+    const query = 'SELECT * FROM publications;'
+    console.log(query);
+    
+    client.execute(query, (err, results) => {
+        if(err){
+            console.log('Error al obtener los datos de bd cassandra', err);
+        }else {
+            res.send(results.rows);
+        }
+    })
+}
 
 /**
  * AGREGA PUBLICACIONES A LA CASSANDRADB
  */
-exports.loadFeaturedPost = function(posts) {
+loadFeaturedPost = function(posts) {
     console.log(posts);
     const queryAdd = 'INSERT INTO PUBLICATIONS (id, title, description, link_Sound, nickname_author, date, countLikes) VALUES (?, ?, ?, ?, ?, ?, ?)'
     var queries = [];
@@ -45,7 +60,17 @@ exports.loadFeaturedPost = function(posts) {
             console.log('Datos insertados correctamente');
         }
     })
-    
+}
+
+exports.removeandSaveCassandraPubs = function (posts){
+    const query = 'Truncate publications;';
+    client.execute(query, [], (err, results) => {
+        if(err) {
+            console.log(err);
+        }else{
+            loadFeaturedPost(posts);
+        }
+    }) 
 }
 
 /**
