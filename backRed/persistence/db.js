@@ -1,15 +1,17 @@
 var mongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
 var nameDataBase = "RedSocial"
+var collectionPerson = 'persons'
+var collectionPublictions = 'publications'
     /********************** GET *****************************/
 exports.getperson = function(req, res) {
-    select(req.body, 'persons', (documentos) => {
+    select(req.body, collectionPerson, (documentos) => {
         res.send(documentos);
     })
 }
 
 exports.getpublications = function(req, res) {
-    select(req.body, 'publications', (documentos) => {
+    select(req.body, collectionPublictions, (documentos) => {
         if (documentos === undefined || documentos.length == 0) {
             valueSend(res, 400, "error", "Ups ocurrio un error")
         } else {
@@ -20,20 +22,20 @@ exports.getpublications = function(req, res) {
 
 
 exports.getpublicationsName = function(req, res) {
-        select("{},{ public_title:1}", 'publications', (documentos) => {
+        select("{},{ public_title:1}", collectionPublictions, (documentos) => {
             res.send(documentos);
         })
     }
     /********************** POST *****************************/
 exports.postPerson = function(req, res) {
     console.log(req.body)
-    insert(req.body, 'persons', (documentos) => {
+    insert(req.body, collectionPerson, (documentos) => {
         res.send(documentos);
     });
 }
 
 exports.login = function(req, res) {
-    select(req.body, 'persons', (documentos) => {
+    select(req.body, collectionPerson, (documentos) => {
         if (documentos === undefined || documentos.length == 0) {
             valueSend(res, 400, "error", "")
         } else {
@@ -64,7 +66,7 @@ exports.postComments = function(req, res) {
 
 exports.postPublications = function(req, res) {
     console.log(req.body)
-    insert(req.body, 'publications', (documentos) => {
+    insert(req.body, collectionPublictions, (documentos) => {
         valueSend(res, 200, "OK", documentos)
     });
 }
@@ -72,7 +74,7 @@ exports.postPublications = function(req, res) {
 /********************** REMOVE *****************************/
 exports.removePerson = function(req, res) {
     var id_person = parseInt(req.params.id_person);
-    remove({ "id_person": id_person }, 'persons', (documentos) => {
+    remove({ "id_person": id_person }, collectionPerson, (documentos) => {
         res.send(documentos);
     });
 }
@@ -80,7 +82,7 @@ exports.removePerson = function(req, res) {
 
 /********************** UPDATE *****************************/
 exports.UpdatePerson = function(req, res) {
-    Update({ "id_person": req.body.id_person }, req.body, 'persons', (documentos) => {
+    Update({ "id_person": req.body.id_person }, req.body, collectionPerson, (documentos) => {
         res.send(documentos);
     });
 }
@@ -95,8 +97,8 @@ function select(query, collection, callback) {
 
 const selectData = async function(query, col, db, callback) {
     const collection = db.collection(col);
-    console.log(query);
-    collection.find(query).toArray(function(err, docs) {
+    collection.find(query).project({ _id: 0 }).toArray(function(err, docs) {
+        console.log(docs)
         callback(docs)
     });
 }
@@ -165,13 +167,13 @@ exports.getMeetPersons = function(req, res) {
 function gettodb(query, callback) {
     mongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, db) { //here db is the client obj
         if (err) throw err;
-        var dbase = db.db("RedSocial"); //here
+        var dbase = db.db(nameDataBase); //here
         findDateDb(query, dbase, callback)
     });
 }
 
 const findDateDb = async function(query, db, callback) {
-    const collection = db.collection('persons');
+    const collection = db.collection(collectionPerson);
     collection.find({}).project(query).toArray(function(err, docs) {
         callback(docs)
     });
