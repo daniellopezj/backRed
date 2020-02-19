@@ -93,6 +93,7 @@ function select(query, collection, callback) {
     mongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true}, function (err, db) { //here db is the client obj
         if (err) throw err;
         const dbase = db.db(nameDataBase); //here
+        console.log(query);
         selectData(query, collection, dbase, callback)
     });
 }
