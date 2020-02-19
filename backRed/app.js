@@ -15,7 +15,7 @@ var allowCrossDomain = function(req, res, next) {
 //Control CORS
 app.use(allowCrossDomain);
 app.use(morgan('dev'));
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 

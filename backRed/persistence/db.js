@@ -1,6 +1,7 @@
 var mongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
-var nameDataBase = "RedSocial"
+var nameDataBase = "RedSocial";
+const neo4jQueries = require('./PersistenceNeo');
     /********************** GET *****************************/
 exports.getperson = function(req, res) {
     select(req.body, 'persons', (documentos) => {
@@ -26,7 +27,7 @@ exports.getpublicationsName = function(req, res) {
     }
     /********************** POST *****************************/
 exports.postPerson = function(req, res) {
-    console.log(req.body)
+    console.log(req.body);
     insert(req.body, 'persons', (documentos) => {
         res.send(documentos);
     });
@@ -63,7 +64,7 @@ exports.postComments = function(req, res) {
 }
 
 exports.postPublications = function(req, res) {
-    console.log(req.body)
+    console.log(req.body);
     insert(req.body, 'publications', (documentos) => {
         valueSend(res, 200, "OK", documentos)
     });
@@ -111,8 +112,10 @@ function insert(query, collection, callback) {
 
 const insertData = async function(query, col, db, callback) {
     const collection = db.collection(col);
+    const {id_person, user, firstName, lastName, email} = query;
     try {
         collection.insertOne(query);
+        neo4jQueries.createPerson(id_person, user, firstName, lastName, email);
         callback({ "status": 200, "message": "guardado exitoso" });
     } catch (error) {
         callback({ "status": 400, "message": "upsss, ocurrio un error" });
@@ -147,7 +150,10 @@ function Update(condition, set, collection, callback) {
 
 const UpdateData = async function(condition, set, col, db, callback) {
     const collection = db.collection(col);
+    const {id_person, firstName, lastName, email} = set;
+    const data = {firstName, lastName, email};
     try {
+        neo4jQueries.updatePerson(id_person, firstName, lastName, email);
         collection.update(condition, set);
         callback({ "status": 200, "message": "actualizacion exitosa" });
     } catch (error) {
