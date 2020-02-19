@@ -1,16 +1,19 @@
 var mongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
+var nameDataBase = "RedSocial"
+var collectionPerson = 'persons'
+var collectionPublictions = 'publications'
 var nameDataBase = "RedSocial";
 const neo4jQueries = require('./PersistenceNeo');
     /********************** GET *****************************/
 exports.getperson = function(req, res) {
-    select(req.body, 'persons', (documentos) => {
+    select(req.body, collectionPerson, (documentos) => {
         res.send(documentos);
     })
 }
 
 exports.getpublications = function(req, res) {
-    select(req.body, 'publications', (documentos) => {
+    select(req.body, collectionPublictions, (documentos) => {
         if (documentos === undefined || documentos.length == 0) {
             valueSend(res, 400, "error", "Ups ocurrio un error")
         } else {
@@ -21,12 +24,14 @@ exports.getpublications = function(req, res) {
 
 
 exports.getpublicationsName = function(req, res) {
-        select("{},{ public_title:1}", 'publications', (documentos) => {
+        select("{},{ public_title:1}", collectionPublictions, (documentos) => {
             res.send(documentos);
         })
     }
     /********************** POST *****************************/
 exports.postPerson = function(req, res) {
+    console.log(req.body)
+    insert(req.body, collectionPerson, (documentos) => {
     console.log(req.body);
     insert(req.body, 'persons', (documentos) => {
         res.send(documentos);
@@ -34,7 +39,7 @@ exports.postPerson = function(req, res) {
 }
 
 exports.login = function(req, res) {
-    select(req.body, 'persons', (documentos) => {
+    select(req.body, collectionPerson, (documentos) => {
         if (documentos === undefined || documentos.length == 0) {
             valueSend(res, 400, "error", "")
         } else {
@@ -64,6 +69,8 @@ exports.postComments = function(req, res) {
 }
 
 exports.postPublications = function(req, res) {
+    console.log(req.body)
+    insert(req.body, collectionPublictions, (documentos) => {
     console.log(req.body);
     insert(req.body, 'publications', (documentos) => {
         valueSend(res, 200, "OK", documentos)
@@ -73,7 +80,7 @@ exports.postPublications = function(req, res) {
 /********************** REMOVE *****************************/
 exports.removePerson = function(req, res) {
     var id_person = parseInt(req.params.id_person);
-    remove({ "id_person": id_person }, 'persons', (documentos) => {
+    remove({ "id_person": id_person }, collectionPerson, (documentos) => {
         res.send(documentos);
     });
 }
@@ -81,7 +88,7 @@ exports.removePerson = function(req, res) {
 
 /********************** UPDATE *****************************/
 exports.UpdatePerson = function(req, res) {
-    Update({ "id_person": req.body.id_person }, req.body, 'persons', (documentos) => {
+    Update({ "id_person": req.body.id_person }, req.body, collectionPerson, (documentos) => {
         res.send(documentos);
     });
 }
@@ -96,8 +103,8 @@ function select(query, collection, callback) {
 
 const selectData = async function(query, col, db, callback) {
     const collection = db.collection(col);
-    console.log(query);
-    collection.find(query).toArray(function(err, docs) {
+    collection.find(query).project({ _id: 0 }).toArray(function(err, docs) {
+        console.log(docs)
         callback(docs)
     });
 }
@@ -112,10 +119,8 @@ function insert(query, collection, callback) {
 
 const insertData = async function(query, col, db, callback) {
     const collection = db.collection(col);
-    const {id_person, user, firstName, lastName, email} = query;
     try {
         collection.insertOne(query);
-        neo4jQueries.createPerson(id_person, user, firstName, lastName, email);
         callback({ "status": 200, "message": "guardado exitoso" });
     } catch (error) {
         callback({ "status": 400, "message": "upsss, ocurrio un error" });
@@ -150,10 +155,7 @@ function Update(condition, set, collection, callback) {
 
 const UpdateData = async function(condition, set, col, db, callback) {
     const collection = db.collection(col);
-    const {id_person, firstName, lastName, email} = set;
-    const data = {firstName, lastName, email};
     try {
-        neo4jQueries.updatePerson(id_person, firstName, lastName, email);
         collection.update(condition, set);
         callback({ "status": 200, "message": "actualizacion exitosa" });
     } catch (error) {
