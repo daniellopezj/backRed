@@ -100,7 +100,6 @@ function select(query, collection, callback) {
 const selectData = async function (query, col, db, callback) {
     const collection = db.collection(col);
     collection.find(query).project({_id: 0}).toArray(function (err, docs) {
-        console.log(docs)
         callback(docs)
     });
 };
@@ -190,14 +189,21 @@ const findDateDb = async function (query, db, callback) {
 Obtener las publicaciones m'as vistas
 */
 exports.getFeaturedPost = function (quantity, cb) {
-    mongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => {
-        db.db(nameDataBase).collection('publications').find({}).sort({ countLikes: -1 }).limit(quantity).toArray((err, result) => {
-            if (err) {
-                console.log("Error obteniendo populares", err);
-            } else {
-                cb(result)
+    mongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true}, (err, db) => {
+        db.db(nameDataBase).collection('publications').find({}).sort({countLikes: -1}).limit(quantity).toArray((err, result) => {
+                if (err) {
+                    console.log("Error obteniendo populares", err);
+                } else {
+                    cb(result)
+                }
             }
-        }
         )
     });
 };
+
+exports.follow = function (req, res) {
+    const {id_person, id_follow, knowDate} = req.body;
+    neo4jQueries.followPerson(id_person, id_follow, knowDate, res);
+};
+
+

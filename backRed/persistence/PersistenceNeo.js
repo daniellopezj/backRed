@@ -29,14 +29,16 @@ exports.updatePerson = (id_person, firstName, lastName, email) => {
     });
 };
 
-exports.followPerson = (id_person, id_follow, knowDate, likes) => {
+exports.followPerson = (id_person, id_follow, knowDate, res) => {
     session.run(`MATCH (a:Person {id_person: $id_person}), (b:Person {id_person: $id_follow})
                         CREATE (a)-[f:Follow {knowDate: $knowDate, likes: $likes}]->(b)
                         RETURN f`,
-        {id_person: id_person, id_follow: id_follow, knowDate: knowDate, likes: likes})
+        {id_person: id_person, id_follow: id_follow, knowDate: knowDate, likes: 0})
         .then(result => {
             console.log(result.records);
+            res.json(result.records);
         }).catch(err => {
+        res.json({"status": 400, "message": "Error al seguir persona"});
         console.log(err);
     });
 };
